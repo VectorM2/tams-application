@@ -25,6 +25,8 @@ const signIn = read("src/pages/SignIn.tsx");
 const forgot = read("src/pages/ForgotPassword.tsx");
 const reset = read("src/pages/ResetPassword.tsx");
 const setPassword = read("src/pages/SetPassword.tsx");
+const sessionProvider = read("src/auth/SessionProvider.tsx");
+const recoveryBoundary = read("src/auth/RecoverySessionBoundary.tsx");
 const migration = read("supabase/migrations/20261003090000_password_reset_audit.sql");
 
 const routes = new Set([...app.matchAll(/<Route path="([^"]+)"/g)].map((m) => m[1]));
@@ -130,16 +132,35 @@ test("the reset writes to no TAMS record at all", () => {
   ]) {
     assert.ok(!reset.includes(forbidden), `the reset page mentions ${forbidden}`);
   }
-  // The only two calls it makes besides the password change.
+  // The only call it makes besides the password change. Session cleanup
+  // is owned by SessionProvider so its recovery marker is cleared too.
   const calls = [...reset.matchAll(/supabase\.(auth\.\w+|rpc)\(/g)].map((m) => m[1]);
-  assert.deepEqual(calls.sort(), ["auth.signOut", "auth.updateUser", "rpc"]);
+  assert.deepEqual(calls.sort(), ["auth.updateUser", "rpc"]);
   assert.match(reset, /supabase\.rpc\("record_password_reset"\)/);
 });
 
 test("the recovery session is ended once the password has been changed", () => {
-  const order = reset.indexOf("updateUser") < reset.indexOf("signOut");
-  assert.ok(order, "the session is ended before the password is changed");
+  assert.match(
+    reset,
+    /updateUser[\s\S]+record_password_reset[\s\S]+await cancelRecovery\(\)/,
+    "the successful reset does not end its recovery session",
+  );
   assert.match(reset, /Go to sign in/);
+});
+
+test("a recovery session cannot become an ordinary application session", () => {
+  assert.match(sessionProvider, /event === "PASSWORD_RECOVERY"/);
+  assert.match(sessionProvider, /rememberRecoveryUser\(nextSession\.user\.id\)/);
+  assert.match(recoveryBoundary, /recoverySession/);
+  assert.match(recoveryBoundary, /location\.pathname !== "\/reset-password"/);
+  assert.match(recoveryBoundary, /<Navigate to="\/reset-password" replace/);
+});
+
+test("leaving a failed reset signs out before navigating away", () => {
+  assert.match(reset, /async function leaveRecovery/);
+  assert.ok(reset.indexOf("await cancelRecovery()") < reset.indexOf("navigate(destination"));
+  assert.match(reset, /leaveRecovery\("\/auth"\)/);
+  assert.match(reset, /leaveRecovery\("\/"\)/);
 });
 
 // ---- 13, 14: a link that cannot be used --------------------------------
@@ -163,7 +184,7 @@ test("Supabase's own complaint about a link is read out of the address", () => {
 
 test("a link that cannot be used explains itself and offers a way on", () => {
   assert.match(reset, /This reset link cannot be used/);
-  assert.match(reset, /to="\/forgot-password"[\s\S]{0,80}Request another reset link/);
+  assert.match(reset, /leaveRecovery\("\/forgot-password"\)[\s\S]{0,100}Request another reset link/);
   assert.match(reset, /Back to sign in/);
   assert.match(reset, /Back to TAMS home/);
   // No blank screen: a missing session takes the same route as a stale link.
@@ -249,5 +270,5 @@ test("every state of the reset page offers somewhere to go", () => {
   // Three states — success, unusable link, and the form — and each one
   // has its own way on.
   assert.equal((reset.match(/btn btn-primary/g) ?? []).length >= 3, true);
-  assert.equal((reset.match(/to="\/auth"/g) ?? []).length >= 3, true);
+  assert.equal((reset.match(/Go to sign in|Back to sign in/g) ?? []).length >= 3, true);
 });

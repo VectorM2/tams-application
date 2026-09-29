@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import {
@@ -18,7 +18,8 @@ import { Field, Notice } from "../components/ui";
  * turned away at the door exactly as it was before.
  */
 export function ResetPassword() {
-  const { session, loading } = useSession();
+  const { session, loading, cancelRecovery } = useSession();
+  const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
@@ -27,6 +28,11 @@ export function ResetPassword() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [linkProblem, setLinkProblem] = useState<string | null>(null);
+
+  async function leaveRecovery(destination: string) {
+    await cancelRecovery();
+    navigate(destination, { replace: true });
+  }
 
   // Supabase reports a stale or already-used link in the address itself.
   // Read it first, so the page can explain rather than sit blank.
@@ -60,7 +66,7 @@ export function ResetPassword() {
     // The recovery session exists for this one job and is finished with.
     // Ending it means the next sign-in is an ordinary one, with the new
     // password, and settles their access the usual way.
-    await supabase.auth.signOut();
+    await cancelRecovery();
     setSubmitting(false);
     setDone(true);
   }
@@ -101,13 +107,14 @@ export function ResetPassword() {
     return (
       <div className="centre">
         <div className="centre-card narrow">
-          <Link to="/" className="brand brand-link" aria-label="TAMS home">
+          <button type="button" className="brand brand-link brand-button" aria-label="TAMS home"
+                  onClick={() => void leaveRecovery("/")}>
             <div className="brand-mark" aria-hidden="true">T</div>
             <div>
               <div className="brand-name">TAMS</div>
               <div className="brand-sub">Traditional Authority</div>
             </div>
-          </Link>
+          </button>
 
           <h1 style={{ fontSize: 24, marginTop: 22 }}>This reset link cannot be used</h1>
 
@@ -125,12 +132,19 @@ export function ResetPassword() {
           </p>
 
           <div className="row" style={{ justifyContent: "center" }}>
-            <Link to="/forgot-password" className="btn btn-primary">Request another reset link</Link>
-            <Link to="/auth" className="btn btn-ghost">Back to sign in</Link>
+            <button type="button" className="btn btn-primary"
+                    onClick={() => void leaveRecovery("/forgot-password")}>
+              Request another reset link
+            </button>
+            <button type="button" className="btn btn-ghost"
+                    onClick={() => void leaveRecovery("/auth")}>
+              Back to sign in
+            </button>
           </div>
 
           <div className="auth-footer">
-            <p><Link to="/">Back to TAMS home</Link></p>
+            <p><button type="button" className="link-button"
+                       onClick={() => void leaveRecovery("/")}>Back to TAMS home</button></p>
           </div>
         </div>
       </div>
@@ -140,13 +154,14 @@ export function ResetPassword() {
   return (
     <div className="centre">
       <div className="centre-card narrow">
-        <Link to="/" className="brand brand-link" aria-label="TAMS home">
+        <button type="button" className="brand brand-link brand-button" aria-label="TAMS home"
+                onClick={() => void leaveRecovery("/")}>
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </Link>
+        </button>
 
         <h1 style={{ fontSize: 24, marginTop: 22 }}>Choose a new password</h1>
         <p className="auth-intro">
@@ -198,8 +213,11 @@ export function ResetPassword() {
 
         <div className="auth-footer">
           <p>
-            Changed your mind? <Link to="/auth">Back to sign in</Link> ·{" "}
-            <Link to="/">Back to home</Link>
+            Changed your mind?{" "}
+            <button type="button" className="link-button"
+                    onClick={() => void leaveRecovery("/auth")}>Back to sign in</button> ·{" "}
+            <button type="button" className="link-button"
+                    onClick={() => void leaveRecovery("/")}>Back to home</button>
           </p>
         </div>
       </div>
