@@ -1,14 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-const securityHeaders = {
+function securityHeaders(allowDevelopmentInlineScript: boolean) {
+  return {
   "Content-Security-Policy": [
     "default-src 'self'",
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
     "object-src 'none'",
-    "script-src 'self'",
+    `script-src 'self'${allowDevelopmentInlineScript ? " 'unsafe-inline'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data:",
     "font-src 'self' data:",
@@ -18,15 +19,18 @@ const securityHeaders = {
   "X-Frame-Options": "DENY",
   "Referrer-Policy": "strict-origin-when-cross-origin",
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
-};
+  };
+}
 
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    headers: securityHeaders,
+    // Vite's React development preamble is inline. This exception exists
+    // only on the local development server; preview keeps the strict CSP.
+    headers: securityHeaders(true),
   },
   preview: {
-    headers: securityHeaders,
+    headers: securityHeaders(false),
   },
 });
