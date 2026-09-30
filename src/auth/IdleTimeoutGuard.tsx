@@ -1,16 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSession } from "./SessionProvider";
 import {
   ACTIVITY_EVENTS, ACTIVITY_THROTTLE_MS, IDLE_CHECK_INTERVAL_MS, IDLE_WARNING_MS,
   LAST_ACTIVITY_KEY, SIGNED_OUT_KEY,
   formatCountdown, idlePhase, idleSignOutPath, idleTimeoutFor, idleTimeoutOverrideMs,
-  mergeActivity, msUntilTimeout, shouldRecordActivity,
+  initialActivityAt, mergeActivity, msUntilTimeout, shouldRecordActivity,
 } from "./idleTimeout";
 
 /** Browser storage that never throws, because a private window will. */
 function writeStored(key: string, value: string): void {
   try { window.localStorage.setItem(key, value); } catch { /* nothing depends on it */ }
+}
+
+function readStored(key: string): string | null {
+  try { return window.localStorage.getItem(key); } catch { return null; }
+}
+
+function removeStored(key: string): void {
+  try { window.localStorage.removeItem(key); } catch { /* nothing depends on it */ }
 }
 
 /**
@@ -26,12 +35,13 @@ function writeStored(key: string, value: string): void {
  * to it. Only a click, a key, a touch or a real navigation moves the
  * timer.
  */
-export function IdleTimeoutGuard() {
-  const { session, profile, signOut } = useSession();
+export function IdleTimeoutGuard({ children }: { children: ReactNode }) {
+  const { loading, session, profile, signOut } = useSession();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [warningRemainingMs, setWarningRemainingMs] = useState<number | null>(null);
+  const [checkedSessionUserId, setCheckedSessionUserId] = useState<string | null>(null);
 
   // Kept in refs, not state: activity must not re-render anything.
   const lastActivityRef = useRef(Date.now());
@@ -56,6 +66,7 @@ export function IdleTimeoutGuard() {
     if (signingOutRef.current) return;
     signingOutRef.current = true;
     setWarningRemainingMs(null);
+    setCheckedSessionUserId(null);
     // Written before signing out, so a tab that is asleep still finds
     // out why it was signed out when it wakes.
     writeStored(SIGNED_OUT_KEY, String(Date.now()));
@@ -65,18 +76,39 @@ export function IdleTimeoutGuard() {
 
   // ---- while there is a session to look after -------------------------
   useEffect(() => {
+    // SessionProvider has not finished restoring browser authentication.
+    // Do not erase the saved clock while that decision is still pending.
+    if (loading) return;
+
     if (!session) {
       signingOutRef.current = false;
       setWarningRemainingMs(null);
+      setCheckedSessionUserId(null);
+      removeStored(LAST_ACTIVITY_KEY);
       return;
     }
 
-    // A fresh sign-in starts the clock now, whatever a previous session
-    // left in storage.
+    // Continue the clock across reloads and closed tabs. A genuinely new
+    // sign-in has a newer last_sign_in_at and therefore starts a new clock.
     const now = Date.now();
-    lastActivityRef.current = now;
-    lastWrittenRef.current = now;
-    writeStored(LAST_ACTIVITY_KEY, String(now));
+    const initialActivity = initialActivityAt(
+      readStored(LAST_ACTIVITY_KEY), session.user.last_sign_in_at, now,
+    );
+    lastActivityRef.current = initialActivity;
+    lastWrittenRef.current = initialActivity;
+    writeStored(LAST_ACTIVITY_KEY, String(initialActivity));
+
+    // Check before the first five-second interval. An already expired
+    // restored session must never render a fresh privileged window.
+    const initialIdleMs = now - initialActivity;
+    const initialPhase = idlePhase(
+      initialIdleMs, timeoutMs, Math.min(IDLE_WARNING_MS, timeoutMs / 2),
+    );
+    if (initialPhase === "expired") { void endSession(); return; }
+    setWarningRemainingMs(
+      initialPhase === "warning" ? msUntilTimeout(initialIdleMs, timeoutMs) : null,
+    );
+    setCheckedSessionUserId(session.user.id);
 
     for (const name of ACTIVITY_EVENTS) {
       window.addEventListener(name, noteActivity, { passive: true });
@@ -111,7 +143,7 @@ export function IdleTimeoutGuard() {
       window.removeEventListener("storage", onStorage);
       window.clearInterval(tick);
     };
-  }, [session, timeoutMs, noteActivity, endSession]);
+  }, [loading, session, timeoutMs, noteActivity, endSession]);
 
   // Moving to another page is somebody working, so it counts. The first
   // render of a page is not a navigation, which is why this watches the
@@ -123,10 +155,16 @@ export function IdleTimeoutGuard() {
     if (session) noteActivity();
   }, [location.pathname, session, noteActivity]);
 
-  if (!session || warningRemainingMs === null) return null;
+  // Do not mount protected pages until a restored session has passed the
+  // inactivity check. This also prevents their data-loading effects from
+  // running during the check.
+  if (session && checkedSessionUserId !== session.user.id) return null;
 
   return (
-    <div className="backdrop" role="presentation">
+    <>
+      {children}
+      {session && warningRemainingMs !== null ? (
+      <div className="backdrop" role="presentation">
       <div
         className="dialog idle-dialog"
         role="alertdialog"
@@ -156,6 +194,8 @@ export function IdleTimeoutGuard() {
           </button>
         </div>
       </div>
-    </div>
+      </div>
+      ) : null}
+    </>
   );
 }

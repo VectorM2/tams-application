@@ -80,9 +80,9 @@ export default function App() {
   return (
     <SessionProvider>
       <BrowserRouter>
-        <IdleTimeoutGuard />
-        <RecoverySessionBoundary>
-          <Routes>
+        <IdleTimeoutGuard>
+          <RecoverySessionBoundary>
+            <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<SignIn />} />
           <Route path="/set-password" element={<SetPassword />} />
@@ -158,8 +158,9 @@ export default function App() {
           {/* Anything else is a page that does not exist — and still has
               a way home, chosen for whoever is asking. */}
           <Route path="*" element={<NotFound />} />
-          </Routes>
-        </RecoverySessionBoundary>
+            </Routes>
+          </RecoverySessionBoundary>
+        </IdleTimeoutGuard>
       </BrowserRouter>
     </SessionProvider>
   );

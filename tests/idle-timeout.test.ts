@@ -17,7 +17,7 @@ import {
   ACTIVITY_EVENTS, ACTIVITY_THROTTLE_MS, IDLE_SIGN_OUT_MESSAGE, IDLE_WARNING_MS,
   LAST_ACTIVITY_KEY, RESIDENT_IDLE_TIMEOUT_MS, SIGNED_OUT_KEY, STAFF_IDLE_TIMEOUT_MS,
   formatCountdown, idlePhase, idleSignOutPath, idleTimeoutFor, idleTimeoutOverrideMs,
-  mergeActivity, msUntilTimeout, shouldRecordActivity, wasSignedOutForIdling,
+  initialActivityAt, mergeActivity, msUntilTimeout, shouldRecordActivity, wasSignedOutForIdling,
 } from "../src/auth/idleTimeout.ts";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -191,6 +191,74 @@ test("unreadable stored activity is ignored rather than trusted", () => {
   for (const junk of [null, "", "soon", "NaN", undefined, {}]) {
     assert.equal(mergeActivity(mine, junk, now), mine, `${String(junk)} should be ignored`);
   }
+});
+
+// ---------------------------------------------------------------------
+// Closing and reopening TAMS does not create activity.
+// ---------------------------------------------------------------------
+
+test("a restored session continues from its saved activity time", () => {
+  const now = Date.parse("2026-09-30T08:30:00Z");
+  const lastActivity = now - 45_000;
+  const signedIn = new Date(now - 10 * MINUTE).toISOString();
+  assert.equal(initialActivityAt(String(lastActivity), signedIn, now), lastActivity);
+});
+
+test("an expired restored session remains expired after reopening", () => {
+  const now = Date.parse("2026-09-30T08:30:00Z");
+  const lastActivity = now - 46_000;
+  const initial = initialActivityAt(
+    String(lastActivity), new Date(now - 10 * MINUTE).toISOString(), now,
+  );
+  assert.equal(idlePhase(now - initial, 45_000, 22_500), "expired");
+});
+
+test("a genuinely new sign-in starts later than stale activity", () => {
+  const now = Date.parse("2026-09-30T08:30:00Z");
+  const oldActivity = now - 20 * MINUTE;
+  const newSignIn = now - 1_000;
+  assert.equal(
+    initialActivityAt(String(oldActivity), new Date(newSignIn).toISOString(), now),
+    newSignIn,
+  );
+});
+
+test("deleting activity storage cannot freshen an old restored session", () => {
+  const now = Date.parse("2026-09-30T08:30:00Z");
+  const signedIn = now - 2 * 60 * MINUTE;
+  assert.equal(initialActivityAt(null, new Date(signedIn).toISOString(), now), signedIn);
+});
+
+test("a future or corrupt activity value cannot extend a session", () => {
+  const now = Date.parse("2026-09-30T08:30:00Z");
+  const signedIn = now - 5 * MINUTE;
+  for (const stored of [String(now + MINUTE), "soon", "", null]) {
+    assert.equal(
+      initialActivityAt(stored, new Date(signedIn).toISOString(), now), signedIn,
+    );
+  }
+});
+
+test("the guard checks restored inactivity before starting its interval", () => {
+  const guard = read("src/auth/IdleTimeoutGuard.tsx");
+  const restore = guard.indexOf("const initialActivity = initialActivityAt");
+  const expiry = guard.indexOf('initialPhase === "expired"');
+  const interval = guard.indexOf("const tick = window.setInterval");
+  assert.ok(restore >= 0 && restore < expiry && expiry < interval);
+});
+
+test("protected routes do not mount before a restored session is checked", () => {
+  const guard = read("src/auth/IdleTimeoutGuard.tsx");
+  const app = read("src/App.tsx");
+  assert.match(guard, /checkedSessionUserId !== session\.user\.id\) return null/);
+  assert.match(app, /<IdleTimeoutGuard>[\s\S]*<RecoverySessionBoundary>/);
+  assert.match(app, /<\/RecoverySessionBoundary>[\s\S]*<\/IdleTimeoutGuard>/);
+});
+
+test("the guard preserves activity while authentication is still loading", () => {
+  const guard = read("src/auth/IdleTimeoutGuard.tsx");
+  assert.match(guard, /if \(loading\) return;/);
+  assert.match(guard, /removeStored\(LAST_ACTIVITY_KEY\)/);
 });
 
 test("the tabs agree through two named keys and no others", () => {
