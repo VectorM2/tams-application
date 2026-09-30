@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./auth/SessionProvider";
 import { IdleTimeoutGuard } from "./auth/IdleTimeoutGuard";
+import { RecoverySessionBoundary } from "./auth/RecoverySessionBoundary";
 import {
   RequireAccount, RequireAdministrator, RequireCouncilSecretary, RequireLandOfficer,
   RequireRegistryClerk, RequireResident, RequireStaff, RequireStaffOrResident,
@@ -79,8 +80,9 @@ export default function App() {
   return (
     <SessionProvider>
       <BrowserRouter>
-        <IdleTimeoutGuard />
-        <Routes>
+        <IdleTimeoutGuard>
+          <RecoverySessionBoundary>
+            <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<SignIn />} />
           <Route path="/set-password" element={<SetPassword />} />
@@ -156,7 +158,9 @@ export default function App() {
           {/* Anything else is a page that does not exist — and still has
               a way home, chosen for whoever is asking. */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+            </Routes>
+          </RecoverySessionBoundary>
+        </IdleTimeoutGuard>
       </BrowserRouter>
     </SessionProvider>
   );

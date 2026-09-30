@@ -12,20 +12,37 @@ type SessionState = {
   profile: StaffContext | null;
   /** The auth user signed in but has no user_accounts record at all. */
   accountMissing: boolean;
+  /** A password-recovery session may change a password, but may not enter TAMS. */
+  recoverySession: boolean;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
+  cancelRecovery: () => Promise<void>;
 };
 
 const SessionContext = createContext<SessionState | undefined>(undefined);
 
 /** How often an open window re-checks that its account is still active. */
 const ACCESS_RECHECK_INTERVAL_MS = 60_000;
+const RECOVERY_SESSION_USER_KEY = "tams:password-recovery-user";
+
+function storedRecoveryUser(): string | null {
+  try { return window.localStorage.getItem(RECOVERY_SESSION_USER_KEY); }
+  catch { return null; }
+}
+
+function rememberRecoveryUser(userId: string | null) {
+  try {
+    if (userId) window.localStorage.setItem(RECOVERY_SESSION_USER_KEY, userId);
+    else window.localStorage.removeItem(RECOVERY_SESSION_USER_KEY);
+  } catch { /* the route guard still protects this tab */ }
+}
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<StaffContext | null>(null);
   const [accountMissing, setAccountMissing] = useState(false);
+  const [recoverySession, setRecoverySession] = useState(false);
 
   // Ask the database who this user is. current_staff_context() works
   // from auth.uid(), so a tampered browser cannot change the answer.
@@ -51,21 +68,56 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession().then(async ({ data }) => {
       if (cancelled) return;
       setSession(data.session);
-      await loadProfile(data.session);
+      const recovering = Boolean(
+        data.session && storedRecoveryUser() === data.session.user.id,
+      );
+      setRecoverySession(recovering);
+      if (recovering) {
+        setProfile(null);
+        setAccountMissing(false);
+      } else {
+        if (!data.session) rememberRecoveryUser(null);
+        await loadProfile(data.session);
+      }
       if (!cancelled) setLoading(false);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
       if (cancelled) return;
       setSession(nextSession);
       setLoading(true);
-      await loadProfile(nextSession);
+      const recovering = Boolean(
+        nextSession && (
+          event === "PASSWORD_RECOVERY" || storedRecoveryUser() === nextSession.user.id
+        ),
+      );
+      if (event === "PASSWORD_RECOVERY" && nextSession) {
+        rememberRecoveryUser(nextSession.user.id);
+      }
+      if (!nextSession) rememberRecoveryUser(null);
+      setRecoverySession(recovering);
+      if (recovering) {
+        setProfile(null);
+        setAccountMissing(false);
+      } else {
+        await loadProfile(nextSession);
+      }
       if (!cancelled) setLoading(false);
     });
+
+    const adoptRecoveryFromAnotherTab = () => {
+      void supabase.auth.getSession().then(({ data }) => {
+        setRecoverySession(Boolean(
+          data.session && storedRecoveryUser() === data.session.user.id,
+        ));
+      });
+    };
+    window.addEventListener("storage", adoptRecoveryFromAnotherTab);
 
     return () => {
       cancelled = true;
       listener.subscription.unsubscribe();
+      window.removeEventListener("storage", adoptRecoveryFromAnotherTab);
     };
   }, [loadProfile]);
 
@@ -107,6 +159,17 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, [loadProfile]);
 
   const signOut = useCallback(async () => {
+    rememberRecoveryUser(null);
+    setRecoverySession(false);
+    await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
+    setAccountMissing(false);
+  }, []);
+
+  const cancelRecovery = useCallback(async () => {
+    rememberRecoveryUser(null);
+    setRecoverySession(false);
     await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
@@ -114,8 +177,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<SessionState>(
-    () => ({ loading, session, profile, accountMissing, refresh, signOut }),
-    [loading, session, profile, accountMissing, refresh, signOut],
+    () => ({
+      loading, session, profile, accountMissing, recoverySession,
+      refresh, signOut, cancelRecovery,
+    }),
+    [
+      loading, session, profile, accountMissing, recoverySession,
+      refresh, signOut, cancelRecovery,
+    ],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

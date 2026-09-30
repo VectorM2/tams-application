@@ -129,6 +129,38 @@ export function mergeActivity(own: number, stored: unknown, now: number): number
 }
 
 /**
+ * Establish the activity time when TAMS opens around an existing session.
+ *
+ * Browser storage survives a closed tab and a stopped development server.
+ * Reopening the app must therefore continue from the saved activity time,
+ * not silently turn the reload into fresh activity.  The authentication
+ * service's last sign-in time is the fallback when storage is absent, and
+ * also separates a genuinely new sign-in from an older user's timestamp.
+ */
+export function initialActivityAt(
+  storedActivity: unknown,
+  lastSignInAt: unknown,
+  now: number,
+): number {
+  const stored = typeof storedActivity === "string"
+    ? Number.parseInt(storedActivity, 10)
+    : Number.NaN;
+  const signedIn = typeof lastSignInAt === "string"
+    ? Date.parse(lastSignInAt)
+    : Number.NaN;
+
+  const safeStored = Number.isFinite(stored) && stored > 0 && stored <= now
+    ? stored
+    : Number.NEGATIVE_INFINITY;
+  const safeSignIn = Number.isFinite(signedIn) && signedIn > 0 && signedIn <= now
+    ? signedIn
+    : Number.NEGATIVE_INFINITY;
+
+  const activity = Math.max(safeStored, safeSignIn);
+  return Number.isFinite(activity) ? activity : now;
+}
+
+/**
  * The sign-in address to land on after an automatic sign-out, so the
  * page can explain itself rather than appearing for no reason.
  */

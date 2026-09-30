@@ -1008,3 +1008,17 @@ td.new-value { font-weight: 600; }
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
+.brand-button,
+.link-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.link-button {
+  color: var(--primary);
+  text-decoration: underline;
+}
