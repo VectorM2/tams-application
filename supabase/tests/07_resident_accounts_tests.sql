@@ -3,6 +3,10 @@
 -- and reapplying with the same account.
 -- =====================================================================
 
+-- Only this throwaway test fixture is updated; the supplied legacy CSV
+-- package stays unchanged. New verification claims now need numeric IDs.
+update public.residents set id_number = '9001010000022' where id_number = 'SYN0000000022';
+
 -- ---- people applying for accounts -----------------------------------
 insert into auth.users (email, last_sign_in_at) values
   ('applicant@village.example',  now()),
@@ -117,7 +121,7 @@ select tams_test.check(
   'DOC 21 — a request without a certified ID copy is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(tams_test.document('proof_of_residence',
         tams_test.put_document(tams_test.applicant(), 'proof.pdf', 100000))))
   $sql$) = 'TA057'
@@ -127,7 +131,7 @@ select tams_test.check(
   'DOC 22 — a request without a proof of residence is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(tams_test.document('certified_id_copy',
         tams_test.put_document(tams_test.applicant(), 'id.pdf', 100000))))
   $sql$) = 'TA057'
@@ -137,7 +141,7 @@ select tams_test.check(
   'DOC 23 — a document larger than 2 MB is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'huge.pdf', 3000000)),
@@ -150,7 +154,7 @@ select tams_test.check(
   'DOC 23a — a small declared size cannot talk a large file through',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         -- claims 1 KB; the stored object is 3 MB
         tams_test.document('certified_id_copy',
@@ -164,7 +168,7 @@ select tams_test.check(
   'DOC 24 — a file type that is not PDF, JPG or PNG is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'id.zip', 100000), 'application/zip'),
@@ -177,7 +181,7 @@ select tams_test.check(
   'DOC 26 — a document belonging to somebody else cannot be attached',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant('applicant2@village.example'), 'id.pdf', 100000)),
@@ -197,7 +201,7 @@ select tams_test.check(
   'REQ 28 — a complete request is submitted',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'id.pdf', 100000)),
@@ -208,7 +212,7 @@ select tams_test.check(
 
 select tams_test.check(
   'REQ 30 — what the applicant claimed was stored as given',
-  (select q.first_name = 'Themba' and q.last_name = 'Ngwenya' and q.id_number = 'SYN0000000022'
+  (select q.first_name = 'Themba' and q.last_name = 'Ngwenya' and q.id_number = '9001010000022'
           and q.house_number = '13' and q.street_address = '13 Marula Street'
           and q.household_head_name = 'Samuel Rachidi'
           and q.relationship_to_household_head = 'Son'
@@ -238,7 +242,7 @@ select tams_test.check(
   'REQ 29 — a second request while one is waiting is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'id2.pdf', 100000)),
@@ -253,7 +257,7 @@ select tams_test.check(
     update public.resident_account_requests set request_status = 'approved'
   $sql$) = '42501'
   and tams_test.run_as('authenticated', tams_test.applicant(), $sql$
-    update public.user_accounts set account_status = 'active', resident_id = tams_test.resident_id_of('SYN0000000022')
+    update public.user_accounts set account_status = 'active', resident_id = tams_test.resident_id_of('9001010000022')
   $sql$) = '42501'
   and tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     insert into public.resident_account_requests (user_account_id, first_name, last_name, id_number,
@@ -312,7 +316,7 @@ select tams_test.check(
   'APP 34 — the clerk sees the request waiting',
   tams_test.query_as('authenticated', tams_test.clerk(),
     $sql$select full_name || ' / ' || id_number
-         from public.registry_pending_resident_requests()$sql$) = 'Themba Ngwenya / SYN0000000022'
+         from public.registry_pending_resident_requests()$sql$) = 'Themba Ngwenya / 9001010000022'
 );
 
 select tams_test.check(
@@ -323,7 +327,7 @@ select tams_test.check(
     'select count(*)::text from public.registry_pending_resident_requests()') = 'ERROR:42501'
   and tams_test.run_as('authenticated', tams_test.uid_of('councilsec@ta.example'), $sql$
     select public.registry_approve_resident_request(
-      (select id from public.resident_account_requests limit 1), tams_test.resident_id_of('SYN0000000022'))
+      (select id from public.resident_account_requests limit 1), tams_test.resident_id_of('9001010000022'))
   $sql$) = '42501'
 );
 
@@ -334,13 +338,13 @@ select tams_test.check(
     from public.registry_resident_candidates(
       (select id from public.resident_account_requests where request_status = 'pending' limit 1))
     order by match_rank limit 1
-  $sql$) = 'SYN0000000022 (Identity number matches exactly)'
+  $sql$) = '9001010000022 (Identity number matches exactly)'
 );
 
 select tams_test.check(
   'APP 36 — the clerk can also search the register by hand',
   tams_test.query_as('authenticated', tams_test.clerk(),
-    $sql$select count(*)::text from public.registry_search_residents('SYN0000000022')$sql$) = '1'
+    $sql$select count(*)::text from public.registry_search_residents('9001010000022')$sql$) = '1'
 );
 
 select tams_test.check(
@@ -439,7 +443,7 @@ select tams_test.check(
   'REA 52 — reapplying creates a new request, with corrected details',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01',
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01',
                       '31 Sekhukhune Street', 'Zanele Ndlovu'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
@@ -484,7 +488,7 @@ select tams_test.check(
   'REA 57 — and a third request, while that one waits, is refused',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'id3.pdf', 100000)),
@@ -508,27 +512,27 @@ select tams_test.check(
 -- =====================================================================
 
 create table tams_test.resident_before_approval as
-  select * from public.residents where id_number = 'SYN0000000022';
+  select * from public.residents where id_number = '9001010000022';
 
 select tams_test.check(
   'APP 58 — the clerk approves, matching them to the official record',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
     select public.registry_approve_resident_request(
       (select id from public.resident_account_requests where request_status = 'pending' limit 1),
-      tams_test.resident_id_of('SYN0000000022'))
+      tams_test.resident_id_of('9001010000022'))
   $sql$) = 'OK'
 );
 
 select tams_test.check(
   'APP 41/42 — the account is linked to that resident and is now active',
-  (select resident_id = tams_test.resident_id_of('SYN0000000022') and account_status = 'active'
+  (select resident_id = tams_test.resident_id_of('9001010000022') and account_status = 'active'
    from public.user_accounts where email = 'applicant@village.example')
 );
 
 select tams_test.check(
   'APP 43 — the request is approved, and records who decided it and when',
   (select q.request_status = 'approved'
-          and q.matched_resident_id = tams_test.resident_id_of('SYN0000000022')
+          and q.matched_resident_id = tams_test.resident_id_of('9001010000022')
           and q.reviewed_by_staff_id = tams_test.staff_id_of('2026070')
           and q.reviewed_at is not null
    from public.resident_account_requests q
@@ -558,15 +562,15 @@ select tams_test.check(
     select (public.resident_portal() ->> 'account_status') || ' :: ' ||
            (public.resident_portal() -> 'resident' ->> 'full_name')
   $sql$) = 'active :: ' || (select first_name || ' ' || last_name
-                            from public.residents where id_number = 'SYN0000000022')
-  and (select first_name <> 'Themba' from public.residents where id_number = 'SYN0000000022')
+                            from public.residents where id_number = '9001010000022')
+  and (select first_name <> 'Themba' from public.residents where id_number = '9001010000022')
 );
 
 select tams_test.check(
   'APP 58b — an approved account cannot submit another request',
   tams_test.run_as('authenticated', tams_test.applicant(), $sql$
     select public.resident_submit_verification_request(
-      tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+      tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
       jsonb_build_array(
         tams_test.document('certified_id_copy',
           tams_test.put_document(tams_test.applicant(), 'id4.pdf', 100000)),
@@ -591,7 +595,7 @@ select tams_test.run_as('authenticated', tams_test.applicant('applicant2@village
 
 select tams_test.run_as('authenticated', tams_test.applicant('applicant2@village.example'), $sql$
   select public.resident_submit_verification_request(
-    tams_test.claim('SYN0000000022', 'Themba', 'Ngwenya', '1990-01-01'),
+    tams_test.claim('9001010000022', 'Themba', 'Ngwenya', '1990-01-01'),
     jsonb_build_array(
       tams_test.document('certified_id_copy',
         tams_test.put_document(tams_test.applicant('applicant2@village.example'), 'id.pdf', 100000)),
@@ -604,14 +608,14 @@ select tams_test.check(
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
     select public.registry_approve_resident_request(
       (select id from public.resident_account_requests where request_status = 'pending' limit 1),
-      tams_test.resident_id_of('SYN0000000022'))
+      tams_test.resident_id_of('9001010000022'))
   $sql$) = 'TA055'
 );
 
 select tams_test.check(
   'APP 40a — the database would refuse it even if that check were missed',
   tams_test.run_as('service_role', null, $sql$
-    update public.user_accounts set resident_id = tams_test.resident_id_of('SYN0000000022')
+    update public.user_accounts set resident_id = tams_test.resident_id_of('9001010000022')
     where email = 'applicant2@village.example'
   $sql$) = '23505'
 );
