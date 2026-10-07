@@ -7,6 +7,9 @@
 
 import { supabase } from "../lib/supabaseClient";
 import { readableError } from "../lib/errorMessage";
+import { normalizeVerificationDetails, validateVerificationDetails } from "./verificationValidation";
+import type { VerificationDetails } from "./verificationValidation";
+export type { VerificationDetails } from "./verificationValidation";
 
 export const DOCUMENT_BUCKET = "resident-verification-documents";
 export const MAXIMUM_DOCUMENT_BYTES = 2 * 1024 * 1024;
@@ -48,21 +51,6 @@ export type ResidentPortal = {
     decline_reason: string | null;
   }[];
   may_submit: boolean;
-};
-
-export type VerificationDetails = {
-  first_name: string;
-  middle_names: string;
-  last_name: string;
-  previous_surname: string;
-  id_number: string;
-  date_of_birth: string;
-  gender: string;
-  cellphone_number: string;
-  house_number: string;
-  street_address: string;
-  household_head_name: string;
-  relationship_to_household_head: string;
 };
 
 export type ResidentResult<T> =
@@ -160,6 +148,10 @@ export async function submitVerificationRequest(
   details: VerificationDetails,
   files: Record<DocumentKind, File>,
 ): Promise<ResidentResult<{ request_id: string; account_status: string }>> {
+  const normalized = normalizeVerificationDetails(details);
+  const problem = Object.values(validateVerificationDetails(normalized))[0];
+  if (problem) return { ok: false, code: "validation", message: problem };
+
   const uploads: UploadedDocument[] = [];
 
   for (const kind of ["certified_id_copy", "proof_of_residence"] as DocumentKind[]) {
@@ -169,7 +161,7 @@ export async function submitVerificationRequest(
   }
 
   return call<{ request_id: string; account_status: string }>("resident_submit_verification_request", {
-    p_details: details,
+    p_details: normalized,
     p_documents: uploads,
   });
 }
