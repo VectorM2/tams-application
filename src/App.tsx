@@ -3,7 +3,7 @@ import { SessionProvider } from "./auth/SessionProvider";
 import { IdleTimeoutGuard } from "./auth/IdleTimeoutGuard";
 import { RecoverySessionBoundary } from "./auth/RecoverySessionBoundary";
 import {
-  RequireAccount, RequireAdministrator, RequireCouncilSecretary, RequireLandOfficer,
+  RequireAdministrator, RequireCouncilSecretary, RequireLandOfficer,
   RequireRegistryClerk, RequireResident, RequireStaff, RequireStaffOrResident,
 } from "./components/guards";
 import { isConfigured } from "./lib/supabaseClient";
@@ -45,12 +45,6 @@ import { MeetingDetail } from "./pages/secretary/MeetingDetail";
 import { Resolutions } from "./pages/secretary/Resolutions";
 import { Projects } from "./pages/secretary/Projects";
 import { ProjectDetail } from "./pages/secretary/ProjectDetail";
-import { Communications } from "./pages/secretary/Communications";
-import { SendCommunication } from "./pages/secretary/SendCommunication";
-import { Notifications } from "./pages/Notifications";
-import { Messages } from "./pages/messages/Messages";
-import { MessageDetail } from "./pages/messages/MessageDetail";
-import { ComposeMessage } from "./pages/messages/ComposeMessage";
 import { AuditTrail } from "./pages/admin/AuditTrail";
 import { AuditDetail } from "./pages/admin/AuditDetail";
 import { TransferAdministrator } from "./pages/admin/TransferAdministrator";
@@ -97,16 +91,9 @@ export default function App() {
 
           {/* Any signed-in resident, whatever their verification */}
           <Route path="/resident" element={<RequireResident><ResidentPortalPage /></RequireResident>} />
-          <Route path="/resident/notifications" element={<RequireResident><Notifications /></RequireResident>} />
 
           {/* Any active staff member */}
           <Route path="/home" element={<RequireStaff><StaffHome /></RequireStaff>} />
-          <Route path="/messages" element={<RequireStaff><Messages /></RequireStaff>} />
-          <Route path="/messages/new" element={<RequireStaff><ComposeMessage /></RequireStaff>} />
-          <Route path="/messages/:messageId" element={<RequireStaff><MessageDetail /></RequireStaff>} />
-
-          {/* Anybody signed in reads their own notifications, and only their own */}
-          <Route path="/notifications" element={<RequireAccount><Notifications /></RequireAccount>} />
 
           {/* The active Council Administrator only */}
           <Route path="/dashboard" element={<RequireAdministrator><AdminDashboard /></RequireAdministrator>} />
@@ -147,8 +134,6 @@ export default function App() {
           <Route path="/secretary/resolutions" element={<RequireCouncilSecretary><Resolutions /></RequireCouncilSecretary>} />
           <Route path="/secretary/projects" element={<RequireCouncilSecretary><Projects /></RequireCouncilSecretary>} />
           <Route path="/secretary/projects/:projectId" element={<RequireCouncilSecretary><ProjectDetail /></RequireCouncilSecretary>} />
-          <Route path="/secretary/communications" element={<RequireCouncilSecretary><Communications /></RequireCouncilSecretary>} />
-          <Route path="/secretary/communications/new" element={<RequireCouncilSecretary><SendCommunication /></RequireCouncilSecretary>} />
 
           {/* The permission document itself. Who may open which one is
               decided in the database, not here: a resident sees their

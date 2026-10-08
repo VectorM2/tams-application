@@ -161,63 +161,17 @@ you host TAMS somewhere, make sure unknown paths serve `index.html`
 (Netlify `_redirects`, Vercel rewrites, or `try_files` on nginx) or that
 link will 404. `npm run dev` already does this.
 
-## 3b. Email, the worker and the recovery secret
+## 3b. The recovery secret
 
-Three things have to be set on the server before email leaves TAMS.
-**None of them is ever referenced from `src/`, and none reaches the
-browser.**
-
-1. **An email provider.** Brevo's free tier is enough. Create an account,
-   verify your sending address, and make an API key.
-
-2. **The secrets**, set from the project folder:
+Set this on the server. It is never referenced from `src/` and never
+reaches the browser:
 
 ```bash
-npx supabase secrets set BREVO_API_KEY=your-brevo-api-key
-npx supabase secrets set TAMS_EMAIL_FROM=no-reply@your-domain.example
-npx supabase secrets set TAMS_EMAIL_FROM_NAME="TAMS"
-npx supabase secrets set TAMS_APP_URL=https://your-tams-address.example
-npx supabase secrets set TAMS_WORKER_SECRET="$(openssl rand -hex 32)"
 npx supabase secrets set TAMS_ADMIN_RECOVERY_SECRET="$(openssl rand -hex 32)"
 ```
 
-   Keep the last two somewhere safe and out of the repository. The worker
-   refuses every request until `TAMS_WORKER_SECRET` is set, and emergency
-   recovery is off entirely until `TAMS_ADMIN_RECOVERY_SECRET` is.
-
-3. **A schedule for the worker.** In the Supabase Dashboard, open
-   **Integrations → Cron** (or **Database → Extensions** and enable
-   `pg_cron` and `pg_net`), then add a job that runs every five minutes:
-
-Fill in your own project reference, anon key and worker secret where the
-placeholders are. Run this in the SQL Editor, where nothing is written to
-a file — never commit the finished statement.
-
-```sql
-select cron.schedule(
-  'tams-notification-emails', '*/5 * * * *',
-  $$
-  select net.http_post(
-    url     := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/process-notification-emails',
-    headers := jsonb_build_object(
-                 'Content-Type', 'application/json',
-                 'Authorization', 'Bearer YOUR-SUPABASE-ANON-KEY',
-                 'x-worker-secret', 'YOUR-TAMS-WORKER-SECRET'),
-    body    := '{"limit": 50}'::jsonb);
-  $$);
-```
-
-   And a daily one for the expiry warnings:
-
-```sql
-select cron.schedule(
-  'tams-pto-expiry-warnings', '0 6 * * *',
-  $$ select public.queue_pto_expiry_warnings(); $$);
-```
-
-   Running either more often than that is harmless: the worker never
-   sends a delivery twice, and each permission receives each threshold
-   exactly once.
+Keep it somewhere safe and out of the repository. Emergency recovery is
+off entirely until it is set.
 
 ## 4. The edge functions
 
@@ -230,10 +184,9 @@ npm run functions:deploy
 `TAMS_SITE_URL` is the address invitation links come back to.
 `TAMS_BOOTSTRAP_SECRET` is used once, in the next step.
 
-`npm run functions:deploy` deploys all five: the three that were already
-there, plus `process-notification-emails` (the email worker) and
-`emergency-admin-recovery`. Neither of the new two is reachable from any
-page in the application, and both require a secret only you hold.
+`npm run functions:deploy` deploys all four: the three that were already
+there, plus `emergency-admin-recovery`. It is not reachable from any page
+in the application, and it requires a secret only you hold.
 
 ## 5. The first Council Administrator
 
@@ -425,23 +378,10 @@ Sign in as a **Council Secretary** for 70–86, and as a verified
 | 91 | Type `/secretary` into the address bar as the resident | Bounced back to `/resident`; the API returns `403` |
 | 92 | As a Registry Clerk or Land Officer, open `/secretary` | Bounced to their own area |
 
-### Checking notifications, messaging, the audit trail and the transfer
+### Checking the audit trail and the transfer
 
 | # | Check | Expected |
 | --- | --- | --- |
-| 93 | Sign in as any role | A bell in the header, and **Notifications** in the navigation |
-| 94 | As a Land Officer, approve a resident's land application | That resident's bell shows one more unread |
-| 95 | Sign in as that resident → **Notifications** | The approval, with its reference; **Mark all as read** empties the count |
-| 96 | **Archive** one, then open the **Archived** tab | It is there; **Everything** still shows it. Nothing was deleted |
-| 97 | As the Council Secretary, **Communications → Send a notice**, a **Summons** to one resident with a date, time, venue and *Chief* | Sent; the list shows one recipient |
-| 98 | Sign in as that resident | The summons is in their notifications, with the date, time, venue and capacity |
-| 99 | Sign in as a different resident | They do not have it |
-| 100 | Send a **Community announcement** to all active residents | Every active resident receives it; the recipient count matches |
-| 101 | Verify a new resident afterwards, then sign in as them | They do **not** have the earlier announcement |
-| 102 | As a Land Officer, **Messages → Compose**, direct to the Registry Clerk, kind **Action required**, linked to a household | Sent, and it appears in the clerk's inbox marked *Action required* |
-| 103 | As the Registry Clerk, open it → **Acknowledge and take it on** → **Mark resolved** | Both recorded with your name and the time; the sender is notified of each |
-| 104 | As a third staff member, open that message's address directly | Refused — it is not theirs |
-| 105 | Compose a **role** work request to Council Secretary with two active secretaries | Both receive it; the first to acknowledge claims it, the second is told who has it and cannot resolve it |
 | 106 | As the Council Administrator, **Audit trail** | Every change, newest first |
 | 107 | Filter by **Action = PTO revoked** and open one | Old beside new: `pto_status` *active* → *revoked*, with the reason |
 | 108 | Look for a password, a token or a document path anywhere in it | There are none, ever |

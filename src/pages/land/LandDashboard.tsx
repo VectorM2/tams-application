@@ -120,7 +120,6 @@ export function LandDashboard() {
                   <Link to="/land/allocations" className="btn btn-ghost">Allocations</Link>
                   <Link to="/land/ptos" className="btn btn-ghost">Permissions to occupy</Link>
                   <Link to="/land/renewals" className="btn btn-ghost">Renewals</Link>
-                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

@@ -87,7 +87,6 @@ export function RegistryDashboard() {
                   <Link to="/registry/households" className="btn btn-ghost">Households</Link>
                   <Link to="/registry/lineage" className="btn btn-ghost">Family lineage</Link>
                   <Link to="/registry/resident-accounts" className="btn btn-ghost">Resident requests</Link>
-                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

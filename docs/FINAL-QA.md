@@ -49,7 +49,6 @@ and residents' after 60.
 - [ ] The permission to occupy is visible and printable
 - [ ] A renewal can be requested for farming or business land
 - [ ] Community updates show public resolutions and projects, and nothing internal
-- [ ] Notifications arrive and can be opened
 - [ ] An official notice or summons arrives
 - [ ] Sign out works
 
@@ -66,8 +65,6 @@ and residents' after 60.
 - [ ] Ending a relationship keeps it on the record rather than removing it
 - [ ] Resident account requests list, and can be approved and declined
 - [ ] Declining requires a reason, and the resident sees it
-- [ ] Messages and work requests can be sent, received and resolved
-- [ ] Notifications arrive
 
 ## Land Officer
 
@@ -83,8 +80,6 @@ and residents' after 60.
 - [ ] An allocation can be released, and stays on record as ended
 - [ ] Burial allocation works and follows its rules
 - [ ] Residential succession appears when a holder is recorded as deceased
-- [ ] Messages and work requests work
-- [ ] Notifications arrive
 
 ## Council Secretary
 
@@ -102,8 +97,6 @@ and residents' after 60.
 - [ ] A community announcement reaches every resident
 - [ ] An official notice reaches named residents only
 - [ ] Several residents can be selected for one notice
-- [ ] Messages and work requests work
-- [ ] Notifications arrive
 
 ## Council Administrator
 
@@ -116,28 +109,7 @@ and residents' after 60.
 - [ ] A deactivated staff member is refused at sign-in
 - [ ] Audit trail opens and can be filtered
 - [ ] Administrator transfer works, and both sides are told
-- [ ] Messages and notifications work
 - [ ] My account shows the right details
-
-## Notifications and email
-
-- [ ] A business action produces an in-app notification
-- [ ] The same notification produces an email
-- [ ] `notification_email_deliveries` records the send
-- [ ] An email that fails does **not** undo the business action
-- [ ] The in-app notification is still there when the email failed
-- [ ] The unread count in the top bar is right, and clears when read
-- [ ] Expiry warnings arrive at 60, 30 and 7 days
-- [ ] They arrive for farming and business only
-- [ ] Residential and burial permissions produce no expiry warning
-- [ ] The same threshold never warns twice for the same permission
-
-## Messaging
-
-- [ ] A message can be sent to another role and arrives
-- [ ] A work request can be acknowledged and resolved
-- [ ] A message grants no permission: a clerk asked to allocate land still cannot
-- [ ] A message body never appears in the audit trail
 
 ## Audit trail
 
@@ -161,7 +133,6 @@ Sign in as the role named and try the thing directly.
 - [ ] A resident cannot edit a household
 - [ ] A resident cannot approve their own verification
 - [ ] A resident cannot allocate land or issue a PTO
-- [ ] A resident cannot open staff messages
 - [ ] A resident cannot open the audit trail
 - [ ] A Registry Clerk cannot allocate land or issue a PTO
 - [ ] A Registry Clerk cannot create council records
