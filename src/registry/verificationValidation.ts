@@ -16,7 +16,13 @@ export type VerificationDetails = {
 export type VerificationErrors = Partial<Record<keyof VerificationDetails, string>>;
 
 const ID_NUMBER = /^[0-9]{13}$/;
-const NAME = /^[\p{L}\p{M}]+(?:[ '’-]+[\p{L}\p{M}]+)*$/u;
+export const NAME = /^[\p{L}\p{M}]+(?:[ '’-]+[\p{L}\p{M}]+)*$/u;
+const PHONE = /^(\+27|0)[0-9]{9}$/;
+
+/** A South African phone number: 0XX XXX XXXX or +27 XX XXX XXXX, spaces allowed. */
+export function isSouthAfricanPhone(value: string): boolean {
+  return PHONE.test(value.replace(/[\s()-]/g, ""));
+}
 
 /** A local calendar date, without converting the user's day to UTC. */
 export function todayForDateInput(today = new Date()): string {
@@ -115,6 +121,10 @@ export function validateVerificationDetails(details: VerificationDetails, today 
 
   if (values.gender !== "Male" && values.gender !== "Female") {
     errors.gender = "Select Male or Female.";
+  }
+
+  if (values.cellphone_number && !isSouthAfricanPhone(values.cellphone_number)) {
+    errors.cellphone_number = "Enter a valid cellphone number, for example 072 123 4567.";
   }
 
   const required: [keyof VerificationDetails, string][] = [

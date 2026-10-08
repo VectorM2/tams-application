@@ -4,8 +4,7 @@ import { homePathFor, useSession } from "../../auth/SessionProvider";
 import { supabase } from "../../lib/supabaseClient";
 import { Field, Loading, Notice } from "../../components/ui";
 import { residentSelfRegistrationEnabled } from "../../lib/featureFlags";
-
-const MINIMUM_PASSWORD_LENGTH = 8;
+import { looksLikeEmail, MINIMUM_PASSWORD_LENGTH, validateNewPassword } from "../../auth/passwordRules";
 
 /**
  * Registering for a resident account.
@@ -33,12 +32,13 @@ export function Register() {
     event.preventDefault();
     setError(null);
 
-    if (password.length < MINIMUM_PASSWORD_LENGTH) {
-      setError(`Your password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`);
+    if (!looksLikeEmail(email)) {
+      setError("Enter a valid email address, for example name@example.com.");
       return;
     }
-    if (password !== confirmation) {
-      setError("The two passwords do not match.");
+    const passwordProblem = validateNewPassword(password, confirmation);
+    if (passwordProblem) {
+      setError(passwordProblem);
       return;
     }
 
