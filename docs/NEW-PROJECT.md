@@ -21,6 +21,19 @@ npx supabase link --project-ref <your-new-project-ref>
 npm run db:push          # applies all 17 migrations
 ```
 
+**Or, without the command line:** paste these into the Supabase **SQL
+Editor** and run them one at a time, in order. They are the same 17
+migrations, split into three parts so the editor accepts them:
+
+1. `scripts/demo/00a_schema_part1.sql`
+2. `scripts/demo/00b_schema_part2.sql`
+3. `scripts/demo/00c_schema_part3.sql`
+
+Use one way or the other, not both. If you built the schema in the SQL
+Editor and later want `db:push` to work, mark the migrations as applied
+first with `npx supabase migration repair --status applied <version>`
+for each file in `supabase/migrations/`.
+
 Do **not** run anything in `supabase/maintenance/` on the new project.
 That folder is for locking an existing deployment down to the administrator only.
 
