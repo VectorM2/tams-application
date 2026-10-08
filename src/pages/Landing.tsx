@@ -1,6 +1,7 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { homePathFor, useSession } from "../auth/SessionProvider";
 import { Loading } from "../components/ui";
+import { residentSelfRegistrationEnabled } from "../lib/featureFlags";
 
 export function Landing() {
   const { loading, session, profile } = useSession();
@@ -29,9 +30,13 @@ export function Landing() {
           <button type="button" className="btn btn-primary" onClick={() => navigate("/auth")}>
             Sign in
           </button>
-          <button type="button" className="btn btn-ghost" onClick={() => navigate("/register")}>
-            Create account
-          </button>
+          {residentSelfRegistrationEnabled
+            ? (
+              <button type="button" className="btn btn-ghost" onClick={() => navigate("/register")}>
+                Create account
+              </button>
+            )
+            : null}
         </div>
 
         <div className="landing-links">

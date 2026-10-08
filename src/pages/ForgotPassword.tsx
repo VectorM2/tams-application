@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 import { passwordResetRedirect } from "../lib/appUrl";
 import { looksLikeEmail, RESET_REQUESTED_MESSAGE } from "../auth/passwordRules";
 import { Field, Notice } from "../components/ui";
+import { residentSelfRegistrationEnabled } from "../lib/featureFlags";
 
 /**
  * Asking for a password reset link. Open to everybody — residents and
@@ -109,9 +110,9 @@ export function ForgotPassword() {
           <p>
             Remembered it? <Link to="/auth">Sign in</Link>.
           </p>
-          <p>
-            Don't have an account? Residents can <Link to="/register">create one</Link>.
-          </p>
+          {residentSelfRegistrationEnabled
+            ? <p>Don't have an account? Residents can <Link to="/register">create one</Link>.</p>
+            : null}
           <p>
             <Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link>
           </p>

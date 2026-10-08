@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { homePathFor, useSession } from "../../auth/SessionProvider";
 import { supabase } from "../../lib/supabaseClient";
 import { Field, Loading, Notice } from "../../components/ui";
+import { residentSelfRegistrationEnabled } from "../../lib/featureFlags";
 
 const MINIMUM_PASSWORD_LENGTH = 8;
 
@@ -26,6 +27,7 @@ export function Register() {
 
   if (loading) return <Loading />;
   if (session) return <Navigate to={homePathFor(profile)} replace />;
+  if (!residentSelfRegistrationEnabled) return <Navigate to="/auth" replace />;
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
