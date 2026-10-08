@@ -15,7 +15,10 @@
     "db:push": "supabase db push",
     "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account manage-staff-account emergency-admin-recovery",
     "import:legacy": "node scripts/import-legacy-data.mjs data/legacy-import",
-    "import:dry-run": "node scripts/import-legacy-data.mjs data/legacy-import --dry-run"
+    "import:dry-run": "node scripts/import-legacy-data.mjs data/legacy-import --dry-run",
+    "demo:generate": "node scripts/demo/generate-demo-seed.mjs",
+    "import:demo": "node scripts/import-legacy-data.mjs data/demo-seed",
+    "import:demo:dry-run": "node scripts/import-legacy-data.mjs data/demo-seed --dry-run"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",

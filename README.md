@@ -35,6 +35,9 @@ audit trail, and handing the administrator role over.
 
 ## Getting started
 
+Setting up a fresh Supabase project with demo data and the first two
+accounts: see [docs/NEW-PROJECT.md](docs/NEW-PROJECT.md).
+
 ```bash
 npm install
 cp .env.example .env     # your Supabase URL and anon key

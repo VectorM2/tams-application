@@ -97,14 +97,14 @@ test("no committed file contains anything shaped like a real secret", () => {
 test("the setup guide asks for secrets by name and never shows one", () => {
   const setup = read("docs/SETUP.md");
 
-  // It must still tell the reader which headers the cron job needs…
-  assert.match(setup, /x-worker-secret/);
-  assert.match(setup, /Authorization/);
+  // It must still tell the reader which secrets the server needs…
+  assert.match(setup, /TAMS_ADMIN_RECOVERY_SECRET/);
+  assert.match(setup, /TAMS_BOOTSTRAP_SECRET/);
 
-  // …with a placeholder in place of every value.
-  assert.match(setup, /YOUR-TAMS-WORKER-SECRET/);
-  assert.match(setup, /YOUR-SUPABASE-ANON-KEY/);
-  assert.match(setup, /YOUR-PROJECT-REF/);
+  // …generated on the spot or left as a placeholder, never written out.
+  assert.match(setup, /TAMS_ADMIN_RECOVERY_SECRET="\$\(openssl rand -hex 32\)"/);
+  assert.match(setup, /TAMS_BOOTSTRAP_SECRET="\$\(openssl rand -hex 32\)"/);
+  assert.match(setup, /<your-project-ref>/);
 });
 
 test(".env is ignored and never tracked", () => {

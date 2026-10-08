@@ -1,0 +1,33 @@
+site_code,site_type,stand_number,street_address,village_section,village_name,site_status
+RES-0001,residential,ST-1777,83 Mahlathi Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0002,residential,ST-1572,60 Mahlathi Street,Mhinga Central,Mhinga Village,allocated
+RES-0003,residential,ST-1456,103 Baobab Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0004,residential,ST-1016,25 Mutale Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0005,residential,ST-2118,127 Mopani Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0006,residential,ST-1990,141 Mutale Street,Mhinga Central,Mhinga Village,allocated
+RES-0007,residential,ST-2139,33 Hosi Mhinga Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0008,residential,ST-1200,36 Mopani Street,Shitlhelani,Mhinga Village,allocated
+RES-0009,residential,ST-1123,13 Nandoni Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0010,residential,ST-1663,166 Tsonga Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0011,residential,ST-1560,49 Mahlathi Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0012,residential,ST-1575,165 Baobab Street,Mhinga Central,Mhinga Village,allocated
+RES-0013,residential,ST-1776,42 Mopani Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0014,residential,ST-1318,104 Mutale Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0015,residential,ST-2176,129 Nkuna Street,Shitlhelani,Mhinga Village,allocated
+RES-0016,residential,ST-1363,123 Marula Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0017,residential,ST-1940,24 Marula Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0018,residential,ST-1172,29 Marula Street,Mhinga Central,Mhinga Village,allocated
+RES-0019,residential,ST-1139,5 Tsonga Street,Mhinga Central,Mhinga Village,allocated
+RES-0020,residential,ST-2287,123 Mutale Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0021,residential,ST-2361,25 Nandoni Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0022,residential,ST-1442,172 Mutale Street,Shitlhelani,Mhinga Village,allocated
+RES-0023,residential,ST-2084,162 Nandoni Street,Shitlhelani,Mhinga Village,allocated
+RES-0024,residential,ST-2019,21 Marula Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0025,residential,ST-1287,170 Nkuna Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0026,residential,ST-1679,155 Xikundu Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0027,residential,ST-1952,96 Mopani Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0028,residential,ST-1748,46 Nandoni Street,Mhinga-Vhuyani,Mhinga Village,allocated
+RES-0029,residential,ST-2190,62 Marula Street,Mhinga Zone 2,Mhinga Village,allocated
+RES-0030,residential,ST-1382,3 Mahlathi Street,Mhinga Central,Mhinga Village,allocated
+RES-0031,residential,ST-1741,11 Xikundu Street,Mhinga Zone 1,Mhinga Village,allocated
+RES-0032,residential,ST-1381,43 Marula Street,Shitlhelani,Mhinga Village,allocated
