@@ -4,6 +4,7 @@ import { homePathFor, useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { Field, Loading, Notice } from "../components/ui";
 import { IDLE_SIGN_OUT_MESSAGE, wasSignedOutForIdling } from "../auth/idleTimeout";
+import { residentSelfRegistrationEnabled } from "../lib/featureFlags";
 
 /**
  * The single sign-in page for every staff role.
@@ -124,9 +125,9 @@ export function SignIn() {
         </p>
 
         <div className="auth-footer">
-          <p>
-            Don't have an account? <Link to="/register">Create one</Link>
-          </p>
+          {residentSelfRegistrationEnabled
+            ? <p>Don't have an account? <Link to="/register">Create one</Link></p>
+            : <p>Council Administrator access only.</p>}
           <p>
             <Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link>
           </p>

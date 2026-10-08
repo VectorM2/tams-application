@@ -88,8 +88,14 @@ a one-time command — see [LEGACY-IMPORT.md](LEGACY-IMPORT.md).
 
 ## 3. Sign-in settings
 
-In **Authentication → Providers → Email**, leave **Enable sign-ups**
-**on** and turn **Confirm email** on. Residents create their own
+For an **administrator-only deployment**, open **Authentication → Sign
+In / Providers → Email** and turn **Allow new users to sign up** off.
+Only existing Auth identities can then sign in. Keep
+`VITE_RESIDENT_SELF_REGISTRATION=false` on the deployed front end.
+
+If the resident portal is opened later, turn **Allow new users to sign
+up** on, turn **Confirm email** on, and set
+`VITE_RESIDENT_SELF_REGISTRATION=true`. Residents then create their own
 sign-ins and confirm their address; that only ever produces a resident
 account, pending verification, with no access to anything. Staff
 accounts are still created solely by the Council Administrator's
