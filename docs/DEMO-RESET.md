@@ -36,7 +36,6 @@ Only these, and only if the clutter is actually in the way:
 | What | How | Why it is safe |
 | --- | --- | --- |
 | A resident account you registered during a demonstration | Council Administrator → deactivate it | Deactivating keeps the record and removes the access. Nothing is lost. |
-| Read notifications | leave them | They are per-person and nobody else sees them. |
 | A test resolution or project | mark it **cancelled** or **withdrawn**, with a reason | This is what the system is for. Cancelling is a real state, not a deletion. |
 | A test meeting | mark it **cancelled**, with a reason | Same. A cancelled meeting is kept deliberately. |
 
@@ -65,11 +64,6 @@ A checklist, in order:
       somewhere to go.
 - [ ] **Empty the inbox you register from** at step 2, or use a fresh
       address, so the confirmation email is easy to find.
-- [ ] **Check both cron jobs are scheduled.** Supabase → Integrations →
-      Cron: `tams-notification-emails` every five minutes, and
-      `tams-pto-expiry-warnings` daily.
-- [ ] **Send one test notification to yourself** and confirm the email
-      arrives, before you rely on it in front of anybody.
 - [ ] **Click once in every window you have set up**, so the inactivity
       timeout has not signed them out while you were preparing.
 

@@ -65,24 +65,25 @@ test("a pending or declined resident still lands on their own portal", () => {
   assert.equal(homeFor(resident("declined"), true), "/resident");
 });
 
-test("every role is offered messages, notifications and their own account", () => {
+test("every role is offered a dashboard and their own account, and no messages or notifications", () => {
   for (const role of ["Council Administrator", "Registry Clerk", "Land Officer", "Council Secretary"]) {
-    const labels = navigationFor(staff(role)).map((item) => item.label);
-    assert.ok(labels.includes("Messages"), `${role} has no Messages`);
-    assert.ok(labels.includes("Notifications"), `${role} has no Notifications`);
+    const items = navigationFor(staff(role));
+    const labels = items.map((item) => item.label);
     assert.ok(labels.includes("My account"), `${role} has no My account`);
     assert.ok(labels.includes("Dashboard"), `${role} has no Dashboard`);
+    assert.ok(!items.some((item) => item.to.startsWith("/messages")), `${role} was offered Messages`);
+    assert.ok(!items.some((item) => item.to.includes("notifications")), `${role} was offered Notifications`);
+    assert.ok(!items.some((item) => item.to.includes("communications")), `${role} was offered Communications`);
   }
 });
 
-test("a resident is offered their home and their notifications, and no staff area", () => {
+test("a resident is offered their home, and no staff area", () => {
   const items = navigationFor(resident());
-  assert.deepEqual(items.map((item) => item.to), ["/resident", "/resident/notifications"]);
+  assert.deepEqual(items.map((item) => item.to), ["/resident"]);
   assert.ok(!items.some((item) => item.to.startsWith("/registry")));
   assert.ok(!items.some((item) => item.to.startsWith("/land")));
   assert.ok(!items.some((item) => item.to.startsWith("/secretary")));
   assert.ok(!items.some((item) => item.to.startsWith("/admin")));
-  assert.ok(!items.some((item) => item.to === "/messages"));
 });
 
 test("only the Council Administrator is offered the audit trail and the transfer", () => {

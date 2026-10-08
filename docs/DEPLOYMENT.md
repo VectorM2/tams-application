@@ -31,7 +31,7 @@ reads them at build time, so a change needs a rebuild, not a restart.
 | `VITE_SUPABASE_URL` | yes | your project URL |
 | `VITE_SUPABASE_ANON_KEY` | yes | the `anon` public key |
 | `VITE_APP_URL` | on a deployed site | the site's own public address, e.g. `https://tams.example.org` |
-| `VITE_RESIDENT_SELF_REGISTRATION` | yes | keep `false` while only the Council Administrator may have access |
+| `VITE_RESIDENT_SELF_REGISTRATION` | yes | keep `false` while only the Council Administrator may have access; set `true` to open `/register`, where the Mhinga site's "Apply for land online" button sends residents |
 
 `VITE_APP_URL` has one job: it is the address that leaves the browser.
 Password-reset emails send people back to it, and it is printed as the
@@ -51,23 +51,16 @@ never appear in this repository and never reach the browser.
 
 | Secret | Used by |
 | --- | --- |
-| `BREVO_API_KEY` | the notification email worker |
-| `TAMS_EMAIL_FROM` | the address email is sent from |
-| `TAMS_EMAIL_FROM_NAME` | the name email is sent from |
-| `TAMS_APP_URL` | the links inside notification emails |
 | `TAMS_SITE_URL` | where a staff invitation link comes back to |
-| `TAMS_WORKER_SECRET` | authorises the cron job to run the email worker |
 | `TAMS_ADMIN_RECOVERY_SECRET` | authorises emergency administrator recovery |
 | `TAMS_BOOTSTRAP_SECRET` | used once, to create the first administrator |
 
 `SUPABASE_SERVICE_ROLE_KEY` is **not** in that list: Supabase gives it
 to the edge functions itself. You never set it and never copy it.
 
-On deployment, `TAMS_APP_URL` and `TAMS_SITE_URL` both become the
-deployed address:
+On deployment, `TAMS_SITE_URL` becomes the deployed address:
 
 ```bash
-npx supabase secrets set TAMS_APP_URL=https://tams.example.org
 npx supabase secrets set TAMS_SITE_URL=https://tams.example.org
 npm run functions:deploy
 ```
@@ -132,16 +125,11 @@ In order, because two of these depend on the address existing:
    `https://<your-address>/set-password` and
    `https://<your-address>/reset-password` to **Redirect URLs**. Leave
    the localhost entries so development keeps working.
-2. **Supabase secrets.** `TAMS_APP_URL` and `TAMS_SITE_URL`, then
+2. **Supabase secrets.** `TAMS_SITE_URL`, then
    `npm run functions:deploy`.
 3. **Rebuild the front end** with `VITE_APP_URL` set, so printed
    permissions carry the right QR code.
-4. **Check the cron jobs are still scheduled** — Dashboard →
-   Integrations → Cron. They are database-side and are unaffected by a
-   front-end deploy, but it is worth confirming both are listed:
-   `tams-notification-emails` every five minutes, and
-   `tams-pto-expiry-warnings` daily.
-5. **Walk the flows in [FINAL-QA.md](FINAL-QA.md)** against the
+4. **Walk the flows in [FINAL-QA.md](FINAL-QA.md)** against the
    deployed address, not localhost.
 
 ## 5. What is checked automatically

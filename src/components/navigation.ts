@@ -25,15 +25,12 @@ export function navigationFor(profile: StaffContext | null): NavItem[] {
   if (profile.account_type === "resident") {
     return [
       { to: "/resident", label: "Home", end: true },
-      { to: "/resident/notifications", label: "Notifications" },
     ];
   }
 
   if (!profile.access_granted) return [];
 
-  const messages: NavItem[] = [
-    { to: "/messages", label: "Messages" },
-    { to: "/notifications", label: "Notifications" },
+  const account: NavItem[] = [
     { to: "/home", label: "My account" },
   ];
 
@@ -44,7 +41,7 @@ export function navigationFor(profile: StaffContext | null): NavItem[] {
       { to: "/staff/new", label: "Create staff account" },
       { to: "/admin/audit", label: "Audit trail" },
       { to: "/admin/transfer", label: "Transfer administrator" },
-      ...messages,
+      ...account,
     ];
   }
 
@@ -55,7 +52,7 @@ export function navigationFor(profile: StaffContext | null): NavItem[] {
       { to: "/registry/households", label: "Households" },
       { to: "/registry/lineage", label: "Family lineage" },
       { to: "/registry/resident-accounts", label: "Resident requests" },
-      ...messages,
+      ...account,
     ];
   }
 
@@ -68,7 +65,7 @@ export function navigationFor(profile: StaffContext | null): NavItem[] {
       { to: "/land/ptos", label: "PTOs" },
       { to: "/land/renewals", label: "Renewals" },
       { to: "/land/succession", label: "Succession" },
-      ...messages,
+      ...account,
     ];
   }
 
@@ -78,11 +75,10 @@ export function navigationFor(profile: StaffContext | null): NavItem[] {
       { to: "/secretary/meetings", label: "Meetings" },
       { to: "/secretary/resolutions", label: "Resolutions" },
       { to: "/secretary/projects", label: "Projects" },
-      { to: "/secretary/communications", label: "Communications" },
-      ...messages,
+      ...account,
     ];
   }
 
   // An active staff member whose role has no area of its own yet.
-  return messages;
+  return account;
 }

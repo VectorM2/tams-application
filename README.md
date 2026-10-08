@@ -6,9 +6,8 @@ Security).
 The foundation, the Council Administrator's staff management, the
 Registry Clerk's register, resident accounts, and the Land Officer's
 land, allocations and permissions to occupy, the Council Secretary's
-meetings, minutes, resolutions and community projects, notifications and
-their emails, official communications, internal staff messaging, the
-immutable audit trail, and handing the administrator role over.
+meetings, minutes, resolutions and community projects, the immutable
+audit trail, and handing the administrator role over.
 
 ## What works today
 
@@ -31,9 +30,6 @@ immutable audit trail, and handing the administrator role over.
 | **Permission to occupy** | A printable document with a QR code, and a public page anyone can use to check that it is genuine. |
 | **Council Secretary** | Meetings, attendance, draft and final minutes, amendments to final minutes, resolutions, projects and milestones. |
 | **Community updates** | Residents read the published resolutions and projects, with each project's milestone progress. |
-| **Notifications** | One system for everybody, in TAMS and by email. The in-app copy stands even when email fails. |
-| **Official notices** | The Council Secretary writes to one resident, a few, or the whole community — including summonses. |
-| **Staff messaging** | Internal messages and work requests between the roles, with a first-to-claim lifecycle. |
 | **Audit trail** | Who changed what, when, from what, to what and why. Insert-only, and the Council Administrator's to read. |
 | **Administrator transfer** | The only way the Council Administrator role ever moves, in one transaction, with an emergency way back in. |
 
@@ -65,11 +61,6 @@ council_meetings ───< meeting_attendance
         └───< council_resolutions ───< community_projects ───< project_milestones
                      └──────────────────────┴───< visibility_changes
 
-user_accounts ───< notifications ───< notification_email_deliveries
-                         └───< pto_expiry_warnings
-resident_communications ───< resident_communication_recipients >─── notifications
-staff_messages ───< staff_message_recipients >─── notifications
-
 audit_logs        (insert only, no relationships — it outlives what it describes)
 ```
 
@@ -93,10 +84,10 @@ is the Council Secretary's. Final minutes are locked and corrected by
 amendment, and a resident sees only what has been published and
 confirmed. See [docs/COUNCIL-SECRETARY.md](docs/COUNCIL-SECRETARY.md).
 
-Everything important that happens to somebody is written down as an
-in-app notification and emailed separately, so an email provider being
-down never undoes a decision. See
-[docs/NOTIFICATIONS-AND-EMAIL.md](docs/NOTIFICATIONS-AND-EMAIL.md).
+Notifications, official communications and internal staff messaging
+have been removed from the app. Their database tables (from the
+`notifications` and `communications` migrations) are still in place but
+nothing in the app reads them.
 
 Every change is recorded in an insert-only audit trail with its old and
 new values, readable by the Council Administrator alone. See
@@ -158,15 +149,13 @@ supabase/migrations/      the foundation, staff management, village records,
                           password reset audit, final hardening
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
-                          manage-staff-account, process-notification-emails,
-                          emergency-admin-recovery
+                          manage-staff-account, emergency-admin-recovery
 supabase/tests/           database test suite (runs on plain PostgreSQL)
 tests/                    edge function rule tests
 scripts/                  one-time administrator bootstrap, legacy import
 docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
                           REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md,
-                          COUNCIL-SECRETARY.md, NOTIFICATIONS-AND-EMAIL.md,
-                          AUDIT-AND-ADMINISTRATION.md, NAVIGATION.md,
+                          COUNCIL-SECRETARY.md, AUDIT-AND-ADMINISTRATION.md, NAVIGATION.md,
                           PASSWORD-RESET.md, DEPLOYMENT.md, FINAL-QA.md,
                           DEMO.md, DEMO-RESET.md
 ```

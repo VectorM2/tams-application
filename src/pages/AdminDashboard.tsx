@@ -85,7 +85,6 @@ export function AdminDashboard() {
                   <Link to="/staff" className="btn btn-ghost">Staff accounts</Link>
                   <Link to="/admin/audit" className="btn btn-ghost">Audit trail</Link>
                   <Link to="/admin/transfer" className="btn btn-ghost">Transfer administrator</Link>
-                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

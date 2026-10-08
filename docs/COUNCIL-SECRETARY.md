@@ -313,13 +313,11 @@ declined, is refused.
 
 ## 13. What came next
 
-Notifications, official communications to residents, internal staff
-messaging and the audit trail were built afterwards — see
-[NOTIFICATIONS-AND-EMAIL.md](NOTIFICATIONS-AND-EMAIL.md) and
+The audit trail was built afterwards — see
 [AUDIT-AND-ADMINISTRATION.md](AUDIT-AND-ADMINISTRATION.md). Everything
-in this document still holds; the Secretary simply also has a
-**Communications** area and a **Messages** inbox now, and every change
-described here is recorded in the audit trail.
+in this document still holds, and every change described here is
+recorded in the audit trail. (Notifications, official communications and
+staff messaging were built later too, and have since been removed.)
 
 ## 14. Deliberately not built at the time
 

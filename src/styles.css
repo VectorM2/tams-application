@@ -1,24 +1,25 @@
 /* =====================================================================
    TAMS — one stylesheet for the whole workspace.
-   Soft lavender page, white rounded cards, one indigo/violet accent.
+   Warm sand page, white rounded cards, one bushveld-green accent —
+   the same Limpopo palette as the Mhinga community site.
    ===================================================================== */
 
 :root {
-  --ink: #171733;
-  --ink-soft: #4a4a68;
-  --muted: #7c7c99;
-  --line: #ecebf5;
-  --line-strong: #dedcee;
+  --ink: #22201c;
+  --ink-soft: #3b3833;
+  --muted: #6f685d;
+  --line: #efe7d8;
+  --line-strong: #e2d5bd;
   --surface: #ffffff;
-  --surface-soft: #f7f6fd;
-  --accent: #4f46e5;
-  --accent-deep: #3f3bd4;
-  --accent-wash: #eeeafe;
-  --gradient: linear-gradient(135deg, #3b5bfd 0%, #6d3ff5 100%);
+  --surface-soft: #fbf8f2;
+  --accent: #2f6444;
+  --accent-deep: #1c3d2a;
+  --accent-wash: #eef4ef;
+  --gradient: linear-gradient(135deg, #244f36 0%, #3f7a55 100%);
   --success-bg: #d8f6e5;
   --success-ink: #0d7a45;
-  --neutral-bg: #eceaf3;
-  --neutral-ink: #5c5c74;
+  --neutral-bg: #f5efe3;
+  --neutral-ink: #625c52;
   --danger: #d33a54;
   --danger-bg: #fdecef;
   /* Every control on a filter row or a form row is exactly this tall.
@@ -30,8 +31,8 @@
   --radius-lg: 22px;
   --radius-md: 14px;
   --radius-sm: 10px;
-  --shadow: 0 18px 45px rgba(30, 33, 92, 0.08);
-  --shadow-soft: 0 6px 20px rgba(30, 33, 92, 0.06);
+  --shadow: 0 18px 45px rgba(34, 32, 28, 0.08);
+  --shadow-soft: 0 6px 20px rgba(34, 32, 28, 0.06);
   --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -43,7 +44,7 @@ body {
   margin: 0;
   font-family: var(--font);
   color: var(--ink);
-  background: linear-gradient(140deg, #e9eefb 0%, #f2effc 48%, #fbf2f8 100%);
+  background: linear-gradient(140deg, #f5efe3 0%, #fbf8f2 48%, #fbf0ea 100%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
 }
@@ -169,9 +170,9 @@ a { color: var(--accent); }
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.22);
+  box-shadow: 0 2px 6px rgba(47, 100, 68, 0.22);
 }
-.btn-primary:not(:disabled):hover { background: var(--accent-deep); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28); }
+.btn-primary:not(:disabled):hover { background: var(--accent-deep); box-shadow: 0 4px 12px rgba(47, 100, 68, 0.28); }
 .btn-primary:not(:disabled):active { background: var(--accent-deep); box-shadow: none; }
 
 .btn-ghost {
@@ -259,7 +260,7 @@ a { color: var(--accent); }
 .field select:focus,
 .field textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+  box-shadow: 0 0 0 3px rgba(47, 100, 68, 0.14);
 }
 
 .field .hint { font-size: 12px; color: var(--muted); line-height: 1.45; }
@@ -309,7 +310,7 @@ a { color: var(--accent); }
 }
 .input-with-button > input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+  box-shadow: 0 0 0 3px rgba(47, 100, 68, 0.14);
 }
 .input-with-button > .btn { flex: 0 0 auto; }
 
@@ -472,7 +473,7 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(23, 23, 51, 0.42);
+  background: rgba(27, 26, 23, 0.42);
   display: grid;
   place-items: center;
   padding: 24px;
@@ -486,7 +487,7 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
   overflow-y: auto;
   background: var(--surface);
   border-radius: var(--radius-lg);
-  box-shadow: 0 30px 70px rgba(23, 23, 51, 0.28);
+  box-shadow: 0 30px 70px rgba(27, 26, 23, 0.28);
   padding: 28px 30px 30px;
 }
 .dialog h2 { font-size: 20px; }
@@ -840,7 +841,7 @@ button:focus-visible,
   text-align: left;
 }
 
-/* ---------- the notification bell and the mobile menu ---------------- */
+/* ---------- the mobile menu ------------------------------------------ */
 
 .menu-toggle {
   display: none;
@@ -852,86 +853,6 @@ button:focus-visible,
   border-radius: 999px;
   background: var(--surface);
   cursor: pointer;
-}
-
-.bell {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  text-decoration: none;
-  font-size: 16px;
-  background: var(--surface-soft);
-}
-.bell:hover { background: var(--accent-wash); }
-.bell-count {
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: var(--danger);
-  color: #fff;
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 18px;
-  text-align: center;
-}
-.nav-count {
-  display: inline-block;
-  margin-left: 6px;
-  min-width: 18px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: var(--danger);
-  color: #fff;
-  font-size: 10.5px;
-  font-weight: 700;
-  line-height: 18px;
-  text-align: center;
-}
-
-/* ---------- notifications and messages ------------------------------- */
-
-.notification {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 16px 18px;
-  background: var(--surface-soft);
-}
-.notification + .notification { margin-top: 10px; }
-.notification.unread { border-left: 3px solid var(--accent); background: var(--accent-wash); }
-.notification .name { font-weight: 600; font-size: 15px; }
-
-tbody tr.unread-row td:first-child { box-shadow: inset 3px 0 0 var(--accent); }
-tbody tr.unread-row .name { font-weight: 700; }
-
-.work-status { margin-top: 14px; }
-
-.chosen-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 8px 6px 12px;
-  border-radius: 999px;
-  background: var(--accent-wash);
-  font-size: 13px;
-  font-weight: 600;
-}
-.chip button {
-  border: 0;
-  background: none;
-  cursor: pointer;
-  font-size: 15px;
-  line-height: 1;
-  color: var(--accent-deep);
-  padding: 0 2px;
 }
 
 /* ---------- the audit viewer ----------------------------------------- */

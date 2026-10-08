@@ -131,8 +131,6 @@ export function SecretaryDashboard() {
                   <Link to="/secretary/meetings" className="btn btn-primary">Meetings</Link>
                   <Link to="/secretary/resolutions" className="btn btn-ghost">Resolutions</Link>
                   <Link to="/secretary/projects" className="btn btn-ghost">Projects</Link>
-                  <Link to="/secretary/communications/new" className="btn btn-ghost">Send a communication</Link>
-                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

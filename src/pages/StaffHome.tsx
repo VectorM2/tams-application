@@ -1,5 +1,4 @@
 import { useSession } from "../auth/SessionProvider";
-import { Link } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { StatusBadge } from "../components/ui";
 import { formatDateTime } from "../lib/format";
@@ -66,10 +65,6 @@ export function StaffHome() {
               If you expected to see one, or any of your details above are wrong, ask the
               Council Administrator.
             </p>
-          </div>
-          <div className="quick-actions" style={{ marginTop: 18 }}>
-            <Link to="/messages" className="btn btn-ghost">Messages</Link>
-            <Link to="/notifications" className="btn btn-ghost">Notifications</Link>
           </div>
         </div>
       </div>

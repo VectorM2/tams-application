@@ -158,22 +158,7 @@ Back in the resident's window: **Community updates**.
 The resolution is there, because its minutes are final. Show an
 internal resolution that is not there.
 
-### 11. An official notice — 2 minutes
-
-As the secretary, send an official notice to that one resident by name.
-
-It arrives in their notifications, and — because notices go out by email
-too — in their inbox. Show both.
-
-### 12. Staff working together — 1 minute
-
-As the Land Officer, send a **work request** to the Registry Clerk.
-Show it arriving, being acknowledged and being resolved.
-
-Mention what a message cannot do: it carries no permission. A clerk who
-receives a request to allocate land still cannot allocate land.
-
-### 13. The audit trail — 3 minutes
+### 11. The audit trail — 3 minutes
 
 In the administrator's window: **Audit trail**.
 
@@ -184,7 +169,7 @@ who, what, when, from what, to what, and why.
 Then try to change an audit entry. There is no way to: the table refuses
 updates and deletes at the database, whoever attempts them.
 
-### 14. Passing the office on — 2 minutes
+### 12. Passing the office on — 2 minutes
 
 **Transfer administrator.** Hand the role to the Registry Clerk, giving
 a reason.
@@ -195,7 +180,7 @@ transfer is itself an audit entry with both sides recorded.
 
 Transfer it back before you continue.
 
-### 15. On a phone — 1 minute
+### 13. On a phone — 1 minute
 
 Open the same site on a phone, or narrow the window to about 390px.
 
@@ -203,7 +188,7 @@ The navigation becomes a menu, forms stack, tables scroll inside
 themselves rather than pushing the page sideways, and every button
 stays usable. Sign in and reach the same resident record.
 
-### 16. Walking away — 1 minute
+### 14. Walking away — 1 minute
 
 If the timing suits, leave a staff window untouched and come back to
 the warning. If it does not, say what it does: 30 minutes for staff, 60
@@ -218,7 +203,6 @@ entirely in a production build.
 
 | What happens | What to do |
 | --- | --- |
-| An email does not arrive | Check spam first. Then Supabase → Authentication → Emails, and the `notification_email_deliveries` table for a failure. Carry on — the in-app notification is always there, whether or not the email was. |
 | A page says a function is not in the schema cache | A migration has not reached the project. Run `notify pgrst, 'reload schema';` in the SQL Editor. |
 | A window has signed itself out | The inactivity timeout. Sign in again; nothing is lost. |
 | A site will not allocate | It is already held. That is the constraint working — say so, and pick another. |

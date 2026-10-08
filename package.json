@@ -13,7 +13,7 @@
     "test:db": "bash supabase/tests/run-db-tests.sh",
     "test:all": "npm run typecheck && npm test && npm run test:db",
     "db:push": "supabase db push",
-    "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account manage-staff-account process-notification-emails emergency-admin-recovery",
+    "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account manage-staff-account emergency-admin-recovery",
     "import:legacy": "node scripts/import-legacy-data.mjs data/legacy-import",
     "import:dry-run": "node scripts/import-legacy-data.mjs data/legacy-import --dry-run"
   },
